@@ -1,0 +1,732 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Little Letter for You ♡</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Great+Vibes&family=Quicksand:wght@400;500;600;700&display=swap');
+
+        :root {
+            --pink: #e98aaa;
+            --deep: #bd557d;
+            --paper: #fffdfb;
+            --ink: #654653;
+            --muted: #987987;
+            --line: #f4d7e2;
+            --shadow: 0 18px 55px rgba(176, 91, 125, .13);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(
+                135deg,
+                #fff0f5,
+                #ffe3ed 48%,
+                #fff6f8
+            );
+            overflow-x: hidden;
+        }
+
+        /* INTERACTION CONTROLS */
+
+        .state {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .site-shell {
+            min-height: 100vh;
+            padding: 24px 18px 42px;
+        }
+
+        /* HEADER */
+
+        .topbar {
+            width: min(100%, 1000px);
+            margin: 0 auto 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand {
+            font-weight: 700;
+            color: var(--deep);
+            font-size: 1.1rem;
+        }
+
+        .nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+
+        .nav label {
+            cursor: pointer;
+            padding: 9px 13px;
+            border: 1px solid rgba(189,85,125,.18);
+            border-radius: 999px;
+            color: var(--deep);
+            background: rgba(255,255,255,.55);
+            font-size: .82rem;
+            font-weight: 700;
+            transition: .25s ease;
+        }
+
+        .nav label:hover {
+            background: white;
+            transform: translateY(-2px);
+        }
+
+        /* PAGE NAVIGATION */
+
+        .page {
+            display: none;
+            width: min(100%, 900px);
+            margin: 0 auto;
+            animation: pageIn .65s ease both;
+        }
+
+        @keyframes pageIn {
+            from {
+                opacity: 0;
+                transform: translateY(13px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #page-home:checked ~ .site-shell .home,
+        #page-letter:checked ~ .site-shell .letter-page,
+        #page-final:checked ~ .site-shell .final-page {
+            display: block;
+        }
+
+        /* HOME PAGE */
+
+        .hero {
+            text-align: center;
+            padding: 38px 18px 24px;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            padding: 7px 13px;
+            border-radius: 999px;
+            background: rgba(255,255,255,.7);
+            color: var(--deep);
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 17px 0 10px;
+            color: var(--deep);
+            font-family: 'Great Vibes', cursive;
+            font-size: clamp(3.5rem, 9vw, 6.3rem);
+            line-height: 1;
+            font-weight: 400;
+        }
+
+        .intro {
+            max-width: 540px;
+            margin: 0 auto;
+            color: var(--muted);
+            line-height: 1.8;
+        }
+
+        /* ENVELOPE */
+
+        .envelope-area {
+            display: grid;
+            place-items: center;
+            padding: 24px 12px 55px;
+        }
+
+        .envelope-wrap {
+            width: min(100%, 390px);
+            text-align: center;
+        }
+
+        .envelope {
+            position: relative;
+            width: 100%;
+            height: 235px;
+            margin: 12px auto 25px;
+            filter: drop-shadow(0 17px 18px rgba(164,78,111,.16));
+            perspective: 900px;
+        }
+
+        .envelope-back {
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            background: #f6b7cb;
+        }
+
+        .letter-peek {
+            position: absolute;
+            z-index: 1;
+            left: 8%;
+            right: 8%;
+            bottom: 12px;
+            height: 185px;
+            padding: 22px 18px;
+            border-radius: 8px;
+            background: var(--paper);
+            color: var(--deep);
+            transition: transform .8s ease;
+        }
+
+        .letter-peek strong {
+            display: block;
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.2rem;
+            font-weight: 400;
+        }
+
+        .letter-peek small {
+            color: var(--muted);
+        }
+
+        .envelope-front {
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            border-radius: 0 0 12px 12px;
+            background: linear-gradient(145deg, #f9c7d7, #ee9fb9);
+            /* Front pocket: side edges fold toward a lower center point. */
+            clip-path: polygon(
+                0 42%, 50% 78%, 100% 42%, 100% 100%, 0 100%
+            );
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 58%;
+            z-index: 4;
+            background: linear-gradient(145deg, #f8c0d2, #f4aec5);
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            transform-origin: top center;
+            transition: transform .75s ease;
+            backface-visibility: hidden;
+        }
+
+        .seal {
+            position: absolute;
+            z-index: 5;
+            left: 50%;
+            top: 48%;
+            transform: translate(-50%,-50%);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: #d96f96;
+            color: white;
+            font-size: 1.35rem;
+            transition: opacity .25s ease;
+        }
+
+        #envelope-open:checked ~ .site-shell .envelope-flap {
+            transform: rotateX(180deg);
+            z-index: 0;
+        }
+
+        #envelope-open:checked ~ .site-shell .letter-peek {
+            transform: translateY(-105px);
+        }
+
+        #envelope-open:checked ~ .site-shell .seal {
+            opacity: 0;
+        }
+
+        .hint {
+            color: var(--muted);
+            font-size: .85rem;
+        }
+
+        /* BUTTONS */
+
+        .button,
+        .button-outline {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 0;
+            border-radius: 999px;
+            padding: 13px 21px;
+            font: 700 .9rem 'Quicksand', sans-serif;
+            cursor: pointer;
+            transition: .2s ease;
+            text-decoration: none;
+        }
+
+        .button {
+            color: white;
+            background: linear-gradient(135deg, #e995b1, #d96f96);
+            box-shadow: 0 8px 18px rgba(197,91,131,.2);
+        }
+
+        .button-outline {
+            color: var(--deep);
+            background: white;
+            border: 1px solid var(--line);
+        }
+
+        .button:hover,
+        .button-outline:hover {
+            transform: translateY(-3px);
+        }
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        /* LETTER PAGE */
+
+        .paper-card {
+            max-width: 720px;
+            margin: 26px auto 30px;
+            padding: clamp(25px, 6vw, 58px);
+            border: 1px solid rgba(230,178,196,.55);
+            border-radius: 18px;
+            background: rgba(255,253,251,.94);
+            box-shadow: var(--shadow);
+        }
+
+        .paper-card h2 {
+            color: var(--deep);
+            font: 400 clamp(2.5rem, 6vw, 3.8rem) 'Great Vibes', cursive;
+            text-align: center;
+        }
+
+        .date-line {
+            text-align: center;
+            color: #bd93a4;
+            font-size: .78rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+        }
+
+        .letter-copy {
+            color: #765968;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .98rem;
+            line-height: 2;
+            white-space: pre-line;
+        }
+
+        .signature {
+            margin-top: 28px;
+            color: var(--deep);
+            font: 2.3rem 'Great Vibes', cursive;
+            text-align: right;
+        }
+
+        .reveal-wrap {
+            text-align: center;
+            margin: 25px 0 12px;
+        }
+
+        .letter-content {
+            display: none;
+        }
+
+        #reveal-letter:checked ~ .site-shell .letter-content {
+            display: block;
+            animation: pageIn .6s ease both;
+        }
+
+        #reveal-letter:checked ~ .site-shell .reveal-prompt {
+            display: none;
+        }
+
+        /* SECTION HEADINGS */
+
+        .section-heading {
+            text-align: center;
+            padding: 35px 10px 10px;
+        }
+
+        .section-heading h2 {
+            color: var(--deep);
+            font: 3.6rem 'Great Vibes', cursive;
+            margin: 12px 0 5px;
+        }
+
+        .section-heading p {
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        /* FINAL PAGE */
+
+        .final-card {
+            max-width: 650px;
+            margin: 45px auto;
+            padding: 50px 25px;
+            text-align: center;
+            border-radius: 22px;
+            background: rgba(255,255,255,.78);
+            border: 1px solid white;
+            box-shadow: var(--shadow);
+        }
+
+        .big-heart {
+            font-size: 4.5rem;
+            display: inline-block;
+            animation: heartbeat 1.6s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%,100% { transform: scale(1); }
+            15% { transform: scale(1.15); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.1); }
+        }
+
+        .final-card h2 {
+            color: var(--deep);
+            font: 3.7rem 'Great Vibes', cursive;
+            margin: 15px 0;
+        }
+
+        .final-card p {
+            color: var(--muted);
+            line-height: 1.9;
+            max-width: 440px;
+            margin: 0 auto;
+        }
+
+        /* FLOATING HEARTS */
+
+        .floating-hearts {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .floating-hearts span {
+            position: absolute;
+            bottom: -40px;
+            color: rgba(221,117,155,.28);
+            animation: floatUp 12s linear infinite;
+            font-size: 20px;
+        }
+
+        .floating-hearts span:nth-child(1) {
+            left: 8%;
+        }
+
+        .floating-hearts span:nth-child(2) {
+            left: 25%;
+            animation-delay: 4s;
+        }
+
+        .floating-hearts span:nth-child(3) {
+            left: 48%;
+            animation-delay: 2s;
+            font-size: 25px;
+        }
+
+        .floating-hearts span:nth-child(4) {
+            left: 70%;
+            animation-delay: 6s;
+        }
+
+        .floating-hearts span:nth-child(5) {
+            left: 90%;
+            animation-delay: 1s;
+        }
+
+        @keyframes floatUp {
+            from {
+                transform: translateY(0);
+                opacity: 0;
+            }
+            15% {
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-110vh) rotate(35deg);
+                opacity: 0;
+            }
+        }
+
+        /* ACTIVE NAVIGATION */
+
+        #page-home:checked ~ .site-shell .nav-home,
+        #page-letter:checked ~ .site-shell .nav-letter,
+        #page-final:checked ~ .site-shell .nav-final {
+            background: white;
+            border-color: var(--pink);
+        }
+
+        /* RESPONSIVE DESIGN */
+
+        @media (max-width: 600px) {
+            .site-shell {
+                padding: 17px 13px 30px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .nav label {
+                padding: 8px 10px;
+                font-size: .76rem;
+            }
+
+            .hero {
+                padding-top: 28px;
+            }
+
+            .envelope {
+                height: 205px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *:before, *:after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- PAGE CONTROLS -->
+
+    <input class="state" type="radio" name="page" id="page-home" checked>
+    <input class="state" type="radio" name="page" id="page-letter">
+    <input class="state" type="radio" name="page" id="page-final">
+
+    <input class="state" type="checkbox" id="envelope-open">
+    <input class="state" type="checkbox" id="reveal-letter">
+
+    <!-- FLOATING HEARTS -->
+
+    <div class="floating-hearts">
+        <span>♡</span>
+        <span>♥</span>
+        <span>♡</span>
+        <span>♥</span>
+        <span>♡</span>
+    </div>
+
+    <main class="site-shell">
+
+        <!-- HEADER -->
+
+        <header class="topbar">
+
+            <div class="brand">
+                A note for you ♡
+            </div>
+
+            <nav class="nav">
+                <label class="nav-home" for="page-home">Home</label>
+                <label class="nav-letter" for="page-letter">The Letter</label>
+                <label class="nav-final" for="page-final">One Last Thing</label>
+            </nav>
+
+        </header>
+
+        <!-- HOME PAGE -->
+
+        <section class="page home">
+
+            <div class="hero">
+
+                <span class="eyebrow">
+                    a tiny surprise for you!
+                </span>
+
+                <h1>For You, Riri! ♡</h1>
+
+                <p class="intro">
+                    
+                    Take your time, open the envelope, and read what's inside. ♡
+                </p>
+
+            </div>
+
+            <div class="envelope-area">
+
+                <div class="envelope-wrap">
+
+                    <div class="envelope">
+
+                        <div class="envelope-back"></div>
+
+                        <div class="letter-peek">
+                            <strong>A letter for you, Riri! ♡ </strong>
+                            <small>(Made by: Ryezo) ♡</small>
+                        </div>
+
+                        <div class="envelope-front"></div>
+                        <div class="envelope-flap"></div>
+                        <div class="seal">♡</div>
+
+                    </div>
+
+                    <p class="hint">
+                        Tap the button to open your envelope
+                    </p>
+
+                    <label class="button" for="envelope-open">
+                        Open the envelope ♡
+                    </label>
+
+                    <div class="button-row">
+                        <label class="button-outline" for="page-letter">
+                            Read my letter →
+                        </label>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- LOVE LETTER PAGE -->
+
+        <section class="page letter-page">
+
+            <div class="section-heading">
+
+                <span class="eyebrow">
+                    something from my heart
+                </span>
+
+                <h2>A Few Words for You</h2>
+
+                <p>
+                    Some things are easier to write down, so here they are.
+                </p>
+
+            </div>
+
+            <div class="paper-card">
+
+                <div class="reveal-prompt reveal-wrap">
+
+                    <p class="hint">
+                        The letter is waiting inside...
+                    </p>
+
+                    <label class="button" for="reveal-letter">
+                        Unfold the letter ♡
+                    </label>
+
+                </div>
+
+                <div class="letter-content">
+
+                    <h2>Dear Riri,</h2>
+
+                    <div class="date-line">
+                        Confession just for you ♡
+                    </div>
+
+                    <div class="letter-copy">
+                For my Riri.
+
+Happy happy birthday riri/kae I hope you have a wonderful day enjoy being a happy girl and don't let anyone define you, always think positive and thanks for being a good friend. I appreciate the moments we share, i hope we can still talk hahaha im a little bit shy but i honestly really like you. You've made my day really special when we are talking, you became my happy pill kae, i never thought that I'd be talking to you, since I joined wareth there's no day I'd dont want to talk to you, thanks for letting me this chance that filled my emptiness. I hope you know that I love you not just in words but in my heart too, im not forcing you to love me back, i just wanna express my feelings and that's it. Happy birthday again kae, enjoy ur day. I wish you many more birthdays to come, always fight your problems, I'm here if you want to rant or say something that you can't tell to others yun lng hehe thanks again happy birthday.
+                    </div>
+
+                    <div class="signature">
+                        With lots of love, <br>
+                        Ryezo ♡
+                    </div>
+
+                    <div class="button-row">
+
+                        <label class="button" for="page-final">
+                            Continue ♡
+                        </label>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- FINAL PAGE -->
+
+        <section class="page final-page">
+
+            <div class="final-card">
+
+                <div class="big-heart">💗</div>
+
+                <span class="eyebrow">
+                    before you go
+                </span>
+
+                <h2>You Are So Special</h2>
+
+                <p>
+                    Thank you for being you. I hope this little website
+                    made you smile, even just a bit.
+                </p>
+
+                <div class="button-row">
+
+                    <label class="button" for="page-home">
+                        Read it again ↺
+                    </label>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>
